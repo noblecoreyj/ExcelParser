@@ -12,6 +12,7 @@ using System.Data.OleDb;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.VisualBasic;
 
@@ -143,6 +144,37 @@ namespace ExcelParser
 
                 // Rebuild string
                 rowString = sb.ToString();
+
+                // Remove quotation marks
+                rowString = rowString.Replace("\"", "");
+
+                // Remove all hyperlinks
+                if (rowString.Length > 3)
+                {
+                    for (int i = 0; i < rowString.Length; i++)
+                    {
+                        if (rowString[0].ToString() == "h")
+                        {
+                            if (rowString[1].ToString() == "t")
+                            {
+                                if (rowString[2].ToString() == "t")
+                                {
+                                    if (rowString[3].ToString() == "p")
+                                    {
+                                        rowString = "";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Replace all illegal characters with empty strings
+                Regex rgx = new Regex("[^a-zA-Z0-9 -'@]");
+                rowString = rgx.Replace(rowString, "");
+
+                // Set rowString to all lowercase
+                rowString = rowString.ToLower();
 
                 // Assign to row
                 dr[0] = rowString;
